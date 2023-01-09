@@ -57,6 +57,12 @@ class MainActivity : AppCompatActivity() {
                 val intent = MyJobService.newIntent(page++)
                 jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
             }
+            else{
+                ContextCompat.startForegroundService(
+                    this,
+                    MyIntentService2.newIntent(this, page++)
+                )
+            }
         }
     }
 }
