@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
+import android.app.job.JobWorkItem
 import android.content.ComponentName
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,8 @@ import androidx.core.content.ContextCompat
 import com.example.servicestest.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private var page: Int = 0
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -43,11 +46,17 @@ class MainActivity : AppCompatActivity() {
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
                 //.setRequiresCharging(true)                                  //работа только при зарядке
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)     //только при wifi
-                .setPersisted(true)                             //запуск после выключения устройства
+                //.setPersisted(true)                             //запуск после выключения устройства
                 .build()
 
             val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.schedule(jobInfo)
+            //jobScheduler.schedule(jobInfo)
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val intent = MyJobService.newIntent(page++)
+                jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
+            }
         }
     }
 }
